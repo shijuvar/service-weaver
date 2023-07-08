@@ -1,0 +1,12 @@
+[serviceweaver]
+binary = "./orderapp"
+
+[single]
+listeners.orderapi = {address = "localhost:3000"}
+
+[multi]
+listeners.orderapi = {address = "localhost:3000"}
+
+[gke]
+regions = ["us-west1"]
+listeners.orderapi = {public_hostname = "orderapp.example.com"}
