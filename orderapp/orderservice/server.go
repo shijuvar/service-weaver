@@ -29,8 +29,6 @@ func (s *Server) Init(context.Context) error {
 		r.Post("/", s.CreateOrder)
 		r.Get("/{orderid}", s.GetOrderByID)
 	})
-	//r.Post("/api/orders", s.CreateOrder)
-	//r.Get("/api/orders", s.CreateOrder)
 	s.handler = r
 	return nil
 }
