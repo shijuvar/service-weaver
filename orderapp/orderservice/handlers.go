@@ -47,6 +47,7 @@ func (s *Server) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		Event:      "order.placed",
 		Modes:      []string{model.Email, model.SMS},
 	}
+	// send notification using notificationService component
 	if err := s.notificationService.Get().Send(ctx, notification); err != nil {
 		s.Logger().Error(
 			"notification failed",
