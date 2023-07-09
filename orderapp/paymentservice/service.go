@@ -5,7 +5,7 @@ import (
 
 	"github.com/ServiceWeaver/weaver"
 
-	"service-weaver/orderapp/model"
+	"github.com/shijuvar/service-weaver/orderapp/model"
 )
 
 type Service interface {

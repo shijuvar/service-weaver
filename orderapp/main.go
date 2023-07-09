@@ -6,7 +6,7 @@ import (
 
 	"github.com/ServiceWeaver/weaver"
 
-	"service-weaver/orderapp/orderservice"
+	"github.com/shijuvar/service-weaver/orderapp/orderservice"
 )
 
 func main() {

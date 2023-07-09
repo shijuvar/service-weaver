@@ -9,7 +9,7 @@ import (
 	chi "github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 
-	"service-weaver/orderapp/model"
+	"github.com/shijuvar/service-weaver/orderapp/model"
 )
 
 var ctx = context.Background()

@@ -8,10 +8,10 @@ import (
 	"errors"
 	"github.com/ServiceWeaver/weaver"
 	"github.com/ServiceWeaver/weaver/runtime/codegen"
+	"github.com/shijuvar/service-weaver/orderapp/model"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 	"reflect"
-	"service-weaver/orderapp/model"
 	"time"
 )
 
@@ -19,14 +19,14 @@ var _ codegen.LatestVersion = codegen.Version[[0][11]struct{}]("You used 'weaver
 
 func init() {
 	codegen.Register(codegen.Registration{
-		Name:  "service-weaver/orderapp/notificationservice/Service",
+		Name:  "github.com/shijuvar/service-weaver/orderapp/notificationservice/Service",
 		Iface: reflect.TypeOf((*Service)(nil)).Elem(),
 		Impl:  reflect.TypeOf(implementation{}),
 		LocalStubFn: func(impl any, tracer trace.Tracer) any {
 			return service_local_stub{impl: impl.(Service), tracer: tracer}
 		},
 		ClientStubFn: func(stub codegen.Stub, caller string) any {
-			return service_client_stub{stub: stub, sendMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "service-weaver/orderapp/notificationservice/Service", Method: "Send"})}
+			return service_client_stub{stub: stub, sendMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "github.com/shijuvar/service-weaver/orderapp/notificationservice/Service", Method: "Send"})}
 		},
 		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
 			return service_server_stub{impl: impl.(Service), addLoad: addLoad}

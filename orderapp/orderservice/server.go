@@ -3,12 +3,12 @@ package orderservice
 import (
 	"context"
 	"net/http"
-	notificationservice "service-weaver/orderapp/notificationservice"
 
 	"github.com/ServiceWeaver/weaver"
 	chi "github.com/go-chi/chi/v5"
 
-	"service-weaver/orderapp/paymentservice"
+	"github.com/shijuvar/service-weaver/orderapp/notificationservice"
+	"github.com/shijuvar/service-weaver/orderapp/paymentservice"
 )
 
 type Server struct {

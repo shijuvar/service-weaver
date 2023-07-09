@@ -1,4 +1,4 @@
-module service-weaver
+module github.com/shijuvar/service-weaver
 
 go 1.20
 
