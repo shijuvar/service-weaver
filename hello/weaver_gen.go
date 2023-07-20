@@ -35,6 +35,21 @@ please file an issue at https://github.com/ServiceWeaver/weaver/issues.
 
 func init() {
 	codegen.Register(codegen.Registration{
+		Name:  "github.com/shijuvar/service-weaver/hello/Greeter",
+		Iface: reflect.TypeOf((*Greeter)(nil)).Elem(),
+		Impl:  reflect.TypeOf(greeter{}),
+		LocalStubFn: func(impl any, caller string, tracer trace.Tracer) any {
+			return greeter_local_stub{impl: impl.(Greeter), tracer: tracer, greetMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "github.com/shijuvar/service-weaver/hello/Greeter", Method: "Greet", Remote: false})}
+		},
+		ClientStubFn: func(stub codegen.Stub, caller string) any {
+			return greeter_client_stub{stub: stub, greetMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "github.com/shijuvar/service-weaver/hello/Greeter", Method: "Greet", Remote: true})}
+		},
+		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
+			return greeter_server_stub{impl: impl.(Greeter), addLoad: addLoad}
+		},
+		RefData: "",
+	})
+	codegen.Register(codegen.Registration{
 		Name:      "github.com/ServiceWeaver/weaver/Main",
 		Iface:     reflect.TypeOf((*weaver.Main)(nil)).Elem(),
 		Impl:      reflect.TypeOf(app{}),
@@ -46,60 +61,37 @@ func init() {
 		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
 			return main_server_stub{impl: impl.(weaver.Main), addLoad: addLoad}
 		},
-		RefData: "⟦ed5dfbe5:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→github.com/shijuvar/service-weaver/hello/Reverser⟧\n⟦17f36ff9:wEaVeRlIsTeNeRs:github.com/ServiceWeaver/weaver/Main→hello⟧\n",
-	})
-	codegen.Register(codegen.Registration{
-		Name:  "github.com/shijuvar/service-weaver/hello/Reverser",
-		Iface: reflect.TypeOf((*Reverser)(nil)).Elem(),
-		Impl:  reflect.TypeOf(reverser{}),
-		LocalStubFn: func(impl any, caller string, tracer trace.Tracer) any {
-			return reverser_local_stub{impl: impl.(Reverser), tracer: tracer, reverseMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "github.com/shijuvar/service-weaver/hello/Reverser", Method: "Reverse", Remote: false})}
-		},
-		ClientStubFn: func(stub codegen.Stub, caller string) any {
-			return reverser_client_stub{stub: stub, reverseMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "github.com/shijuvar/service-weaver/hello/Reverser", Method: "Reverse", Remote: true})}
-		},
-		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
-			return reverser_server_stub{impl: impl.(Reverser), addLoad: addLoad}
-		},
-		RefData: "",
+		RefData: "⟦04fd361f:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→github.com/shijuvar/service-weaver/hello/Greeter⟧\n⟦17f36ff9:wEaVeRlIsTeNeRs:github.com/ServiceWeaver/weaver/Main→hello⟧\n",
 	})
 }
 
 // weaver.Instance checks.
+var _ weaver.InstanceOf[Greeter] = (*greeter)(nil)
 var _ weaver.InstanceOf[weaver.Main] = (*app)(nil)
-var _ weaver.InstanceOf[Reverser] = (*reverser)(nil)
 
 // weaver.Router checks.
+var _ weaver.Unrouted = (*greeter)(nil)
 var _ weaver.Unrouted = (*app)(nil)
-var _ weaver.Unrouted = (*reverser)(nil)
 
 // Local stub implementations.
 
-type main_local_stub struct {
-	impl   weaver.Main
-	tracer trace.Tracer
+type greeter_local_stub struct {
+	impl         Greeter
+	tracer       trace.Tracer
+	greetMetrics *codegen.MethodMetrics
 }
 
-// Check that main_local_stub implements the weaver.Main interface.
-var _ weaver.Main = (*main_local_stub)(nil)
+// Check that greeter_local_stub implements the Greeter interface.
+var _ Greeter = (*greeter_local_stub)(nil)
 
-type reverser_local_stub struct {
-	impl           Reverser
-	tracer         trace.Tracer
-	reverseMetrics *codegen.MethodMetrics
-}
-
-// Check that reverser_local_stub implements the Reverser interface.
-var _ Reverser = (*reverser_local_stub)(nil)
-
-func (s reverser_local_stub) Reverse(ctx context.Context, a0 string) (r0 string, err error) {
+func (s greeter_local_stub) Greet(ctx context.Context, a0 string) (r0 string, err error) {
 	// Update metrics.
-	begin := s.reverseMetrics.Begin()
-	defer func() { s.reverseMetrics.End(begin, err != nil, 0, 0) }()
+	begin := s.greetMetrics.Begin()
+	defer func() { s.greetMetrics.End(begin, err != nil, 0, 0) }()
 	span := trace.SpanFromContext(ctx)
 	if span.SpanContext().IsValid() {
 		// Create a child span for this method.
-		ctx, span = s.tracer.Start(ctx, "main.Reverser.Reverse", trace.WithSpanKind(trace.SpanKindInternal))
+		ctx, span = s.tracer.Start(ctx, "main.Greeter.Greet", trace.WithSpanKind(trace.SpanKindInternal))
 		defer func() {
 			if err != nil {
 				span.RecordError(err)
@@ -109,36 +101,37 @@ func (s reverser_local_stub) Reverse(ctx context.Context, a0 string) (r0 string,
 		}()
 	}
 
-	return s.impl.Reverse(ctx, a0)
+	return s.impl.Greet(ctx, a0)
 }
+
+type main_local_stub struct {
+	impl   weaver.Main
+	tracer trace.Tracer
+}
+
+// Check that main_local_stub implements the weaver.Main interface.
+var _ weaver.Main = (*main_local_stub)(nil)
 
 // Client stub implementations.
 
-type main_client_stub struct {
-	stub codegen.Stub
+type greeter_client_stub struct {
+	stub         codegen.Stub
+	greetMetrics *codegen.MethodMetrics
 }
 
-// Check that main_client_stub implements the weaver.Main interface.
-var _ weaver.Main = (*main_client_stub)(nil)
+// Check that greeter_client_stub implements the Greeter interface.
+var _ Greeter = (*greeter_client_stub)(nil)
 
-type reverser_client_stub struct {
-	stub           codegen.Stub
-	reverseMetrics *codegen.MethodMetrics
-}
-
-// Check that reverser_client_stub implements the Reverser interface.
-var _ Reverser = (*reverser_client_stub)(nil)
-
-func (s reverser_client_stub) Reverse(ctx context.Context, a0 string) (r0 string, err error) {
+func (s greeter_client_stub) Greet(ctx context.Context, a0 string) (r0 string, err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
-	begin := s.reverseMetrics.Begin()
-	defer func() { s.reverseMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
+	begin := s.greetMetrics.Begin()
+	defer func() { s.greetMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
 
 	span := trace.SpanFromContext(ctx)
 	if span.SpanContext().IsValid() {
 		// Create a child span for this method.
-		ctx, span = s.stub.Tracer().Start(ctx, "main.Reverser.Reverse", trace.WithSpanKind(trace.SpanKindClient))
+		ctx, span = s.stub.Tracer().Start(ctx, "main.Greeter.Greet", trace.WithSpanKind(trace.SpanKindClient))
 	}
 
 	defer func() {
@@ -185,43 +178,34 @@ func (s reverser_client_stub) Reverse(ctx context.Context, a0 string) (r0 string
 	return
 }
 
+type main_client_stub struct {
+	stub codegen.Stub
+}
+
+// Check that main_client_stub implements the weaver.Main interface.
+var _ weaver.Main = (*main_client_stub)(nil)
+
 // Server stub implementations.
 
-type main_server_stub struct {
-	impl    weaver.Main
+type greeter_server_stub struct {
+	impl    Greeter
 	addLoad func(key uint64, load float64)
 }
 
-// Check that main_server_stub implements the codegen.Server interface.
-var _ codegen.Server = (*main_server_stub)(nil)
+// Check that greeter_server_stub implements the codegen.Server interface.
+var _ codegen.Server = (*greeter_server_stub)(nil)
 
 // GetStubFn implements the codegen.Server interface.
-func (s main_server_stub) GetStubFn(method string) func(ctx context.Context, args []byte) ([]byte, error) {
+func (s greeter_server_stub) GetStubFn(method string) func(ctx context.Context, args []byte) ([]byte, error) {
 	switch method {
+	case "Greet":
+		return s.greet
 	default:
 		return nil
 	}
 }
 
-type reverser_server_stub struct {
-	impl    Reverser
-	addLoad func(key uint64, load float64)
-}
-
-// Check that reverser_server_stub implements the codegen.Server interface.
-var _ codegen.Server = (*reverser_server_stub)(nil)
-
-// GetStubFn implements the codegen.Server interface.
-func (s reverser_server_stub) GetStubFn(method string) func(ctx context.Context, args []byte) ([]byte, error) {
-	switch method {
-	case "Reverse":
-		return s.reverse
-	default:
-		return nil
-	}
-}
-
-func (s reverser_server_stub) reverse(ctx context.Context, args []byte) (res []byte, err error) {
+func (s greeter_server_stub) greet(ctx context.Context, args []byte) (res []byte, err error) {
 	// Catch and return any panics detected during encoding/decoding/rpc.
 	defer func() {
 		if err == nil {
@@ -237,11 +221,27 @@ func (s reverser_server_stub) reverse(ctx context.Context, args []byte) (res []b
 	// TODO(rgrandl): The deferred function above will recover from panics in the
 	// user code: fix this.
 	// Call the local method.
-	r0, appErr := s.impl.Reverse(ctx, a0)
+	r0, appErr := s.impl.Greet(ctx, a0)
 
 	// Encode the results.
 	enc := codegen.NewEncoder()
 	enc.String(r0)
 	enc.Error(appErr)
 	return enc.Data(), nil
+}
+
+type main_server_stub struct {
+	impl    weaver.Main
+	addLoad func(key uint64, load float64)
+}
+
+// Check that main_server_stub implements the codegen.Server interface.
+var _ codegen.Server = (*main_server_stub)(nil)
+
+// GetStubFn implements the codegen.Server interface.
+func (s main_server_stub) GetStubFn(method string) func(ctx context.Context, args []byte) ([]byte, error) {
+	switch method {
+	default:
+		return nil
+	}
 }

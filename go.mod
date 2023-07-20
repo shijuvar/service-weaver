@@ -4,8 +4,10 @@ go 1.20
 
 require (
 	github.com/ServiceWeaver/weaver v0.17.0
+	github.com/cockroachdb/cockroach-go v2.0.1+incompatible
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/google/uuid v1.3.0
+	github.com/lib/pq v1.10.9
 	go.opentelemetry.io/otel v1.16.0
 	go.opentelemetry.io/otel/trace v1.16.0
 )

@@ -44,7 +44,7 @@ func init() {
 		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
 			return main_server_stub{impl: impl.(weaver.Main), addLoad: addLoad}
 		},
-		RefData: "⟦83067cca:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→github.com/shijuvar/service-weaver/orderapp/paymentservice/Service⟧\n⟦4f95437a:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→github.com/shijuvar/service-weaver/orderapp/notificationservice/Service⟧\n⟦a1bdd4f1:wEaVeRlIsTeNeRs:github.com/ServiceWeaver/weaver/Main→orderapi⟧\n",
+		RefData: "⟦83067cca:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→github.com/shijuvar/service-weaver/orderapp/paymentservice/Service⟧\n⟦4f95437a:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→github.com/shijuvar/service-weaver/orderapp/notificationservice/Service⟧\n⟦faf0257c:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→github.com/shijuvar/service-weaver/orderapp/cockroachdb/Repository⟧\n⟦a1bdd4f1:wEaVeRlIsTeNeRs:github.com/ServiceWeaver/weaver/Main→orderapi⟧\n",
 	})
 }
 

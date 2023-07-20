@@ -1,5 +1,12 @@
 [serviceweaver]
 binary = "./orderapp"
+rollout = "5m"
+colocate = [
+    [
+        "main",
+        "github.com/shijuvar/service-weaver/orderapp/cockroachdb/Repository"
+    ]
+]
 
 [single]
 listeners.orderapi = {address = "localhost:3000"}

@@ -2,10 +2,10 @@
 binary = "./hello"
 
 [single]
-listeners.hello = {address = "localhost:12345"}
+listeners.hello = {address = "localhost:8081"}
 
 [multi]
-listeners.hello = {address = "localhost:12345"}
+listeners.hello = {address = "localhost:8081"}
 
 [gke]
 regions = ["us-west1"]

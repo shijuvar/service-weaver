@@ -7,6 +7,7 @@ import (
 	"github.com/ServiceWeaver/weaver"
 	chi "github.com/go-chi/chi/v5"
 
+	"github.com/shijuvar/service-weaver/orderapp/cockroachdb"
 	"github.com/shijuvar/service-weaver/orderapp/notificationservice"
 	"github.com/shijuvar/service-weaver/orderapp/paymentservice"
 )
@@ -14,12 +15,13 @@ import (
 type Server struct {
 	weaver.Implements[weaver.Main]
 
-	handler http.Handler
+	handler http.Handler // http router instance
 
 	paymentService      weaver.Ref[paymentservice.Service]
 	notificationService weaver.Ref[notificationservice.Service]
+	orderRepository     weaver.Ref[cockroachdb.Repository]
 
-	orderapi weaver.Listener `weaver:"orderapi"`
+	orderapi weaver.Listener //`weaver:"orderapi"`
 }
 
 func (s *Server) Init(context.Context) error {

@@ -17,7 +17,7 @@ func main() {
 
 type app struct {
 	weaver.Implements[weaver.Main]
-	reverser weaver.Ref[Reverser]
+	reverser weaver.Ref[Greeter]
 	hello    weaver.Listener `weaver:"hello"`
 }
 
@@ -29,14 +29,14 @@ func serve(ctx context.Context, app *app) error {
 	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
 		name := r.URL.Query().Get("name")
 		if name == "" {
-			name = "World"
+			name = "Gopher"
 		}
-		reversed, err := app.reverser.Get().Reverse(ctx, name)
+		greet, err := app.reverser.Get().Greet(ctx, name)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		fmt.Fprintf(w, "Hello, %s!\n", reversed)
+		fmt.Fprint(w, "Greeter: ", greet)
 	})
 	return http.Serve(app.hello, nil)
 }

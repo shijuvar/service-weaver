@@ -2,10 +2,13 @@ package model
 
 import (
 	"time"
+
+	"github.com/ServiceWeaver/weaver"
 )
 
 // Order aggregate
 type Order struct {
+	weaver.AutoMarshal
 	ID           string      `json:"order_id,omitempty"`
 	CustomerID   string      `json:"customer_id,omitempty"`
 	Status       string      `json:"status,omitempty"`
@@ -17,6 +20,7 @@ type Order struct {
 
 // OrderItem value type
 type OrderItem struct {
+	weaver.AutoMarshal
 	ProductCode string  `json:"code,omitempty"`
 	Name        string  `json:"name,omitempty"`
 	UnitPrice   float64 `json:"unit_price,omitempty"`

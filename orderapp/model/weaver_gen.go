@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/ServiceWeaver/weaver"
 	"github.com/ServiceWeaver/weaver/runtime/codegen"
+	"time"
 )
 
 var _ codegen.LatestVersion = codegen.Version[[0][17]struct{}](`
@@ -94,6 +95,102 @@ func serviceweaver_dec_slice_string_4af10117(dec *codegen.Decoder) []string {
 		res[i] = dec.String()
 	}
 	return res
+}
+
+var _ codegen.AutoMarshal = (*Order)(nil)
+
+type __is_Order[T ~struct {
+	weaver.AutoMarshal
+	ID           string      "json:\"order_id,omitempty\""
+	CustomerID   string      "json:\"customer_id,omitempty\""
+	Status       string      "json:\"status,omitempty\""
+	CreatedOn    time.Time   "json:\"created_on,omitempty\""
+	RestaurantId string      "json:\"restaurant_id,omitempty\""
+	Amount       float64     "json:\"amount,omitempty\""
+	OrderItems   []OrderItem "json:\"order_items,omitempty\""
+}] struct{}
+
+var _ __is_Order[Order]
+
+func (x *Order) WeaverMarshal(enc *codegen.Encoder) {
+	if x == nil {
+		panic(fmt.Errorf("Order.WeaverMarshal: nil receiver"))
+	}
+	enc.String(x.ID)
+	enc.String(x.CustomerID)
+	enc.String(x.Status)
+	enc.EncodeBinaryMarshaler(&x.CreatedOn)
+	enc.String(x.RestaurantId)
+	enc.Float64(x.Amount)
+	serviceweaver_enc_slice_OrderItem_63a22cdf(enc, x.OrderItems)
+}
+
+func (x *Order) WeaverUnmarshal(dec *codegen.Decoder) {
+	if x == nil {
+		panic(fmt.Errorf("Order.WeaverUnmarshal: nil receiver"))
+	}
+	x.ID = dec.String()
+	x.CustomerID = dec.String()
+	x.Status = dec.String()
+	dec.DecodeBinaryUnmarshaler(&x.CreatedOn)
+	x.RestaurantId = dec.String()
+	x.Amount = dec.Float64()
+	x.OrderItems = serviceweaver_dec_slice_OrderItem_63a22cdf(dec)
+}
+
+func serviceweaver_enc_slice_OrderItem_63a22cdf(enc *codegen.Encoder, arg []OrderItem) {
+	if arg == nil {
+		enc.Len(-1)
+		return
+	}
+	enc.Len(len(arg))
+	for i := 0; i < len(arg); i++ {
+		(arg[i]).WeaverMarshal(enc)
+	}
+}
+
+func serviceweaver_dec_slice_OrderItem_63a22cdf(dec *codegen.Decoder) []OrderItem {
+	n := dec.Len()
+	if n == -1 {
+		return nil
+	}
+	res := make([]OrderItem, n)
+	for i := 0; i < n; i++ {
+		(&res[i]).WeaverUnmarshal(dec)
+	}
+	return res
+}
+
+var _ codegen.AutoMarshal = (*OrderItem)(nil)
+
+type __is_OrderItem[T ~struct {
+	weaver.AutoMarshal
+	ProductCode string  "json:\"code,omitempty\""
+	Name        string  "json:\"name,omitempty\""
+	UnitPrice   float64 "json:\"unit_price,omitempty\""
+	Quantity    int     "json:\"quantity,omitempty\""
+}] struct{}
+
+var _ __is_OrderItem[OrderItem]
+
+func (x *OrderItem) WeaverMarshal(enc *codegen.Encoder) {
+	if x == nil {
+		panic(fmt.Errorf("OrderItem.WeaverMarshal: nil receiver"))
+	}
+	enc.String(x.ProductCode)
+	enc.String(x.Name)
+	enc.Float64(x.UnitPrice)
+	enc.Int(x.Quantity)
+}
+
+func (x *OrderItem) WeaverUnmarshal(dec *codegen.Decoder) {
+	if x == nil {
+		panic(fmt.Errorf("OrderItem.WeaverUnmarshal: nil receiver"))
+	}
+	x.ProductCode = dec.String()
+	x.Name = dec.String()
+	x.UnitPrice = dec.Float64()
+	x.Quantity = dec.Int()
 }
 
 var _ codegen.AutoMarshal = (*OrderPayment)(nil)
