@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-
 	"github.com/ServiceWeaver/weaver"
 	"github.com/cockroachdb/cockroach-go/crdb"
 	_ "github.com/lib/pq"
@@ -14,6 +13,7 @@ import (
 
 type Repository interface {
 	CreateOrder(context.Context, model.Order) error
+	GetOrderByID(context.Context, string) (model.Order, error)
 }
 
 type repository struct {
@@ -25,10 +25,10 @@ type repository struct {
 func (repo *repository) Init(context.Context) error {
 	cfg := repo.Config()
 	if err := cfg.Validate(); err != nil {
-		repo.Logger().Error("error", err)
+		repo.Logger().Error("error:", err)
 	}
 	db, err := sql.Open(cfg.Driver, cfg.Source)
-	repo.Logger().Info("connected sql")
+	repo.Logger().Info("connected to DB")
 
 	if err != nil {
 		return err
@@ -65,6 +65,45 @@ func (repo *repository) CreateOrder(ctx context.Context, order model.Order) erro
 	return nil
 }
 
+// GetOrderByID query the Orders by given id
+func (repo *repository) GetOrderByID(ctx context.Context, id string) (model.Order, error) {
+	var orderRow = model.Order{}
+	if err := repo.db.QueryRowContext(ctx,
+		"SELECT id, customerid, status, createdon, restaurantid FROM orders WHERE id = $1",
+		id).
+		Scan(
+			&orderRow.ID, &orderRow.CustomerID, &orderRow.Status, &orderRow.CreatedOn, &orderRow.RestaurantId,
+		); err != nil {
+		return orderRow, err
+	}
+	return orderRow, nil
+}
+
+// GetOrderItems query the order items by given order id
+func (repo *repository) GetOrderItems(ctx context.Context, id string) ([]model.OrderItem, error) {
+	rows, err := repo.db.QueryContext(ctx,
+		"SELECT code, name, unitprice, quantity FROM orderitems WHERE orderid = $1", id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	// An OrderItem slice to hold data from returned rows.
+	var oitems []model.OrderItem
+
+	// Loop through rows, using Scan to assign column data to struct fields.
+	for rows.Next() {
+		var item model.OrderItem
+		if err := rows.Scan(&item.ProductCode, &item.Name, &item.UnitPrice,
+			&item.Quantity); err != nil {
+			return oitems, err
+		}
+		oitems = append(oitems, item)
+	}
+	if err = rows.Err(); err != nil {
+		return oitems, err
+	}
+	return oitems, nil
+}
 func createOrder(tx *sql.Tx, order model.Order) error {
 
 	// Insert into the "orders" table.
