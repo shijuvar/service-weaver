@@ -40,10 +40,10 @@ func init() {
 		Iface: reflect.TypeOf((*Repository)(nil)).Elem(),
 		Impl:  reflect.TypeOf(repository{}),
 		LocalStubFn: func(impl any, caller string, tracer trace.Tracer) any {
-			return repository_local_stub{impl: impl.(Repository), tracer: tracer, createOrderMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "github.com/shijuvar/service-weaver/orderapp/cockroachdb/Repository", Method: "CreateOrder", Remote: false}), getOrderByIDMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "github.com/shijuvar/service-weaver/orderapp/cockroachdb/Repository", Method: "GetOrderByID", Remote: false})}
+			return repository_local_stub{impl: impl.(Repository), tracer: tracer, createOrderMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "github.com/shijuvar/service-weaver/orderapp/cockroachdb/Repository", Method: "CreateOrder", Remote: false}), getOrderByIDMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "github.com/shijuvar/service-weaver/orderapp/cockroachdb/Repository", Method: "GetOrderByID", Remote: false}), getOrderItemsMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "github.com/shijuvar/service-weaver/orderapp/cockroachdb/Repository", Method: "GetOrderItems", Remote: false})}
 		},
 		ClientStubFn: func(stub codegen.Stub, caller string) any {
-			return repository_client_stub{stub: stub, createOrderMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "github.com/shijuvar/service-weaver/orderapp/cockroachdb/Repository", Method: "CreateOrder", Remote: true}), getOrderByIDMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "github.com/shijuvar/service-weaver/orderapp/cockroachdb/Repository", Method: "GetOrderByID", Remote: true})}
+			return repository_client_stub{stub: stub, createOrderMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "github.com/shijuvar/service-weaver/orderapp/cockroachdb/Repository", Method: "CreateOrder", Remote: true}), getOrderByIDMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "github.com/shijuvar/service-weaver/orderapp/cockroachdb/Repository", Method: "GetOrderByID", Remote: true}), getOrderItemsMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "github.com/shijuvar/service-weaver/orderapp/cockroachdb/Repository", Method: "GetOrderItems", Remote: true})}
 		},
 		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
 			return repository_server_stub{impl: impl.(Repository), addLoad: addLoad}
@@ -61,10 +61,11 @@ var _ weaver.Unrouted = (*repository)(nil)
 // Local stub implementations.
 
 type repository_local_stub struct {
-	impl                Repository
-	tracer              trace.Tracer
-	createOrderMetrics  *codegen.MethodMetrics
-	getOrderByIDMetrics *codegen.MethodMetrics
+	impl                 Repository
+	tracer               trace.Tracer
+	createOrderMetrics   *codegen.MethodMetrics
+	getOrderByIDMetrics  *codegen.MethodMetrics
+	getOrderItemsMetrics *codegen.MethodMetrics
 }
 
 // Check that repository_local_stub implements the Repository interface.
@@ -110,12 +111,33 @@ func (s repository_local_stub) GetOrderByID(ctx context.Context, a0 string) (r0 
 	return s.impl.GetOrderByID(ctx, a0)
 }
 
+func (s repository_local_stub) GetOrderItems(ctx context.Context, a0 string) (r0 []model.OrderItem, err error) {
+	// Update metrics.
+	begin := s.getOrderItemsMetrics.Begin()
+	defer func() { s.getOrderItemsMetrics.End(begin, err != nil, 0, 0) }()
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.tracer.Start(ctx, "cockroachdb.Repository.GetOrderItems", trace.WithSpanKind(trace.SpanKindInternal))
+		defer func() {
+			if err != nil {
+				span.RecordError(err)
+				span.SetStatus(codes.Error, err.Error())
+			}
+			span.End()
+		}()
+	}
+
+	return s.impl.GetOrderItems(ctx, a0)
+}
+
 // Client stub implementations.
 
 type repository_client_stub struct {
-	stub                codegen.Stub
-	createOrderMetrics  *codegen.MethodMetrics
-	getOrderByIDMetrics *codegen.MethodMetrics
+	stub                 codegen.Stub
+	createOrderMetrics   *codegen.MethodMetrics
+	getOrderByIDMetrics  *codegen.MethodMetrics
+	getOrderItemsMetrics *codegen.MethodMetrics
 }
 
 // Check that repository_client_stub implements the Repository interface.
@@ -227,6 +249,62 @@ func (s repository_client_stub) GetOrderByID(ctx context.Context, a0 string) (r0
 	return
 }
 
+func (s repository_client_stub) GetOrderItems(ctx context.Context, a0 string) (r0 []model.OrderItem, err error) {
+	// Update metrics.
+	var requestBytes, replyBytes int
+	begin := s.getOrderItemsMetrics.Begin()
+	defer func() { s.getOrderItemsMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
+
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.stub.Tracer().Start(ctx, "cockroachdb.Repository.GetOrderItems", trace.WithSpanKind(trace.SpanKindClient))
+	}
+
+	defer func() {
+		// Catch and return any panics detected during encoding/decoding/rpc.
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+			if err != nil {
+				err = errors.Join(weaver.RemoteCallError, err)
+			}
+		}
+
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+		}
+		span.End()
+
+	}()
+
+	// Preallocate a buffer of the right size.
+	size := 0
+	size += (4 + len(a0))
+	enc := codegen.NewEncoder()
+	enc.Reset(size)
+
+	// Encode arguments.
+	enc.String(a0)
+	var shardKey uint64
+
+	// Call the remote method.
+	requestBytes = len(enc.Data())
+	var results []byte
+	results, err = s.stub.Run(ctx, 2, enc.Data(), shardKey)
+	replyBytes = len(results)
+	if err != nil {
+		err = errors.Join(weaver.RemoteCallError, err)
+		return
+	}
+
+	// Decode the results.
+	dec := codegen.NewDecoder(results)
+	r0 = serviceweaver_dec_slice_OrderItem_63a22cdf(dec)
+	err = dec.Error()
+	return
+}
+
 // Server stub implementations.
 
 type repository_server_stub struct {
@@ -244,6 +322,8 @@ func (s repository_server_stub) GetStubFn(method string) func(ctx context.Contex
 		return s.createOrder
 	case "GetOrderByID":
 		return s.getOrderByID
+	case "GetOrderItems":
+		return s.getOrderItems
 	default:
 		return nil
 	}
@@ -296,4 +376,54 @@ func (s repository_server_stub) getOrderByID(ctx context.Context, args []byte) (
 	(r0).WeaverMarshal(enc)
 	enc.Error(appErr)
 	return enc.Data(), nil
+}
+
+func (s repository_server_stub) getOrderItems(ctx context.Context, args []byte) (res []byte, err error) {
+	// Catch and return any panics detected during encoding/decoding/rpc.
+	defer func() {
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+		}
+	}()
+
+	// Decode arguments.
+	dec := codegen.NewDecoder(args)
+	var a0 string
+	a0 = dec.String()
+
+	// TODO(rgrandl): The deferred function above will recover from panics in the
+	// user code: fix this.
+	// Call the local method.
+	r0, appErr := s.impl.GetOrderItems(ctx, a0)
+
+	// Encode the results.
+	enc := codegen.NewEncoder()
+	serviceweaver_enc_slice_OrderItem_63a22cdf(enc, r0)
+	enc.Error(appErr)
+	return enc.Data(), nil
+}
+
+// Encoding/decoding implementations.
+
+func serviceweaver_enc_slice_OrderItem_63a22cdf(enc *codegen.Encoder, arg []model.OrderItem) {
+	if arg == nil {
+		enc.Len(-1)
+		return
+	}
+	enc.Len(len(arg))
+	for i := 0; i < len(arg); i++ {
+		(arg[i]).WeaverMarshal(enc)
+	}
+}
+
+func serviceweaver_dec_slice_OrderItem_63a22cdf(dec *codegen.Decoder) []model.OrderItem {
+	n := dec.Len()
+	if n == -1 {
+		return nil
+	}
+	res := make([]model.OrderItem, n)
+	for i := 0; i < n; i++ {
+		(&res[i]).WeaverUnmarshal(dec)
+	}
+	return res
 }

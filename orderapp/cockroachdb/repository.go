@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+
 	"github.com/ServiceWeaver/weaver"
 	"github.com/cockroachdb/cockroach-go/crdb"
 	_ "github.com/lib/pq"
@@ -11,17 +12,21 @@ import (
 	"github.com/shijuvar/service-weaver/orderapp/model"
 )
 
+// Repository interface for command and query operations
 type Repository interface {
 	CreateOrder(context.Context, model.Order) error
 	GetOrderByID(context.Context, string) (model.Order, error)
+	GetOrderItems(context.Context, string) ([]model.OrderItem, error)
 }
 
+// Implementation for Repository interface
 type repository struct {
 	weaver.Implements[Repository]
 	weaver.WithConfig[config]
 	db *sql.DB
 }
 
+// Init access storage information from configuration and connect to SQL DB
 func (repo *repository) Init(context.Context) error {
 	cfg := repo.Config()
 	if err := cfg.Validate(); err != nil {
@@ -52,7 +57,7 @@ func (cfg *config) Validate() error {
 	return nil
 }
 
-// CreateOrder persist Order data into the query model
+// CreateOrder persist Order data
 func (repo *repository) CreateOrder(ctx context.Context, order model.Order) error {
 
 	// Run a transaction to sync the query model.
