@@ -1,4 +1,4 @@
-# service-weaver examples
+# Service Weaver Examples
 <strong> Guidance for building modern distributed applications in Go with Service Weaver</strong>
 
 ### Articles
