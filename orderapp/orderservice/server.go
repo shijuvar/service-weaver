@@ -7,7 +7,6 @@ import (
 	"github.com/ServiceWeaver/weaver"
 	chi "github.com/go-chi/chi/v5"
 
-	"github.com/shijuvar/service-weaver/orderapp/cockroachdb"
 	"github.com/shijuvar/service-weaver/orderapp/notificationservice"
 	"github.com/shijuvar/service-weaver/orderapp/paymentservice"
 )
@@ -19,7 +18,7 @@ type Server struct {
 
 	paymentService      weaver.Ref[paymentservice.Service]
 	notificationService weaver.Ref[notificationservice.Service]
-	orderRepository     weaver.Ref[cockroachdb.Repository]
+	//orderRepository     weaver.Ref[cockroachdb.Repository]
 
 	orderapi weaver.Listener //`weaver:"orderapi"`
 }

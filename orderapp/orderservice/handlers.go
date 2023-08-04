@@ -29,14 +29,14 @@ func (s *Server) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	order.Amount = order.GetAmount()
 	s.Logger().Debug("items:", len(order.OrderItems))
 	// persistence using orderRepository component
-	if err := s.orderRepository.Get().CreateOrder(ctx, order); err != nil {
-		s.Logger().Error(
-			"order failed",
-			"error:", err,
-		)
-		http.Error(w, "order failed", http.StatusInternalServerError)
-		return
-	}
+	//if err := s.orderRepository.Get().CreateOrder(ctx, order); err != nil {
+	//	s.Logger().Error(
+	//		"order failed",
+	//		"error:", err,
+	//	)
+	//	http.Error(w, "order failed", http.StatusInternalServerError)
+	//	return
+	//}
 	orderPayment := model.OrderPayment{
 		OrderID:    order.ID,
 		CustomerID: order.CustomerID,

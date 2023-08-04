@@ -3,7 +3,7 @@ module github.com/shijuvar/service-weaver
 go 1.20
 
 require (
-	github.com/ServiceWeaver/weaver v0.18.0
+	github.com/ServiceWeaver/weaver v0.18.1
 	github.com/cockroachdb/cockroach-go v2.0.1+incompatible
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/google/uuid v1.3.0
