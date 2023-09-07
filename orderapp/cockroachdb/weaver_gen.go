@@ -14,26 +14,6 @@ import (
 	"reflect"
 )
 
-var _ codegen.LatestVersion = codegen.Version[[0][17]struct{}](`
-
-ERROR: You generated this file with 'weaver generate' v0.18.0 (codegen
-version v0.17.0). The generated code is incompatible with the version of the
-github.com/ServiceWeaver/weaver module that you're using. The weaver module
-version can be found in your go.mod file or by running the following command.
-
-    go list -m github.com/ServiceWeaver/weaver
-
-We recommend updating the weaver module and the 'weaver generate' command by
-running the following.
-
-    go get github.com/ServiceWeaver/weaver@latest
-    go install github.com/ServiceWeaver/weaver/cmd/weaver@latest
-
-Then, re-run 'weaver generate' and re-build your code. If the problem persists,
-please file an issue at https://github.com/ServiceWeaver/weaver/issues.
-
-`)
-
 func init() {
 	codegen.Register(codegen.Registration{
 		Name:  "github.com/shijuvar/service-weaver/orderapp/cockroachdb/Repository",
@@ -47,6 +27,9 @@ func init() {
 		},
 		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
 			return repository_server_stub{impl: impl.(Repository), addLoad: addLoad}
+		},
+		ReflectStubFn: func(caller func(string, context.Context, []any, []any) error) any {
+			return repository_reflect_stub{caller: caller}
 		},
 		RefData: "",
 	})
@@ -305,6 +288,29 @@ func (s repository_client_stub) GetOrderItems(ctx context.Context, a0 string) (r
 	return
 }
 
+// Note that "weaver generate" will always generate the error message below.
+// Everything is okay. The error message is only relevant if you see it when
+// you run "go build" or "go run".
+var _ codegen.LatestVersion = codegen.Version[[0][20]struct{}](`
+
+ERROR: You generated this file with 'weaver generate' v0.20.0 (codegen
+version v0.20.0). The generated code is incompatible with the version of the
+github.com/ServiceWeaver/weaver module that you're using. The weaver module
+version can be found in your go.mod file or by running the following command.
+
+    go list -m github.com/ServiceWeaver/weaver
+
+We recommend updating the weaver module and the 'weaver generate' command by
+running the following.
+
+    go get github.com/ServiceWeaver/weaver@latest
+    go install github.com/ServiceWeaver/weaver/cmd/weaver@latest
+
+Then, re-run 'weaver generate' and re-build your code. If the problem persists,
+please file an issue at https://github.com/ServiceWeaver/weaver/issues.
+
+`)
+
 // Server stub implementations.
 
 type repository_server_stub struct {
@@ -401,6 +407,30 @@ func (s repository_server_stub) getOrderItems(ctx context.Context, args []byte) 
 	serviceweaver_enc_slice_OrderItem_63a22cdf(enc, r0)
 	enc.Error(appErr)
 	return enc.Data(), nil
+}
+
+// Reflect stub implementations.
+
+type repository_reflect_stub struct {
+	caller func(string, context.Context, []any, []any) error
+}
+
+// Check that repository_reflect_stub implements the Repository interface.
+var _ Repository = (*repository_reflect_stub)(nil)
+
+func (s repository_reflect_stub) CreateOrder(ctx context.Context, a0 model.Order) (err error) {
+	err = s.caller("CreateOrder", ctx, []any{a0}, []any{})
+	return
+}
+
+func (s repository_reflect_stub) GetOrderByID(ctx context.Context, a0 string) (r0 model.Order, err error) {
+	err = s.caller("GetOrderByID", ctx, []any{a0}, []any{&r0})
+	return
+}
+
+func (s repository_reflect_stub) GetOrderItems(ctx context.Context, a0 string) (r0 []model.OrderItem, err error) {
+	err = s.caller("GetOrderItems", ctx, []any{a0}, []any{&r0})
+	return
 }
 
 // Encoding/decoding implementations.

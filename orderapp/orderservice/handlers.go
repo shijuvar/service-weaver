@@ -1,7 +1,6 @@
 package orderservice
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -11,8 +10,6 @@ import (
 
 	"github.com/shijuvar/service-weaver/orderapp/model"
 )
-
-var ctx = context.Background()
 
 func (s *Server) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	var order model.Order
@@ -27,7 +24,7 @@ func (s *Server) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	order.Status = "Placed"
 	order.CreatedOn = time.Now()
 	order.Amount = order.GetAmount()
-	s.Logger().Debug("items:", len(order.OrderItems))
+	s.Logger(ctx).Debug("items:", len(order.OrderItems))
 	// persistence using orderRepository component
 	//if err := s.orderRepository.Get().CreateOrder(ctx, order); err != nil {
 	//	s.Logger().Error(
@@ -44,7 +41,7 @@ func (s *Server) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	}
 	// make payment using paymentservice component
 	if err := s.paymentService.Get().MakePayment(ctx, orderPayment); err != nil {
-		s.Logger().Error(
+		s.Logger(ctx).Error(
 			"payment failed",
 			"error:", err,
 		)
@@ -59,12 +56,12 @@ func (s *Server) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	}
 	// send notification using notificationService component
 	if err := s.notificationService.Get().Send(ctx, notification); err != nil {
-		s.Logger().Error(
+		s.Logger(ctx).Error(
 			"notification failed",
 			"error:", err,
 		)
 	}
-	s.Logger().Info(
+	s.Logger(ctx).Info(
 		"order has been placed",
 		"order id", order.ID,
 		"customer id", order.CustomerID,
@@ -80,7 +77,7 @@ func (s *Server) GetOrderByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// ToDO: Get Order by ID
-	s.Logger().Debug(
+	s.Logger(ctx).Debug(
 		"GetOrderByID",
 		"order ID", orderID,
 	)

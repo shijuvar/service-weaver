@@ -8,6 +8,8 @@ import (
 	"github.com/shijuvar/service-weaver/orderapp/model"
 )
 
+var ctx = context.Background()
+
 type Service interface {
 	MakePayment(ctx context.Context, orderPayment model.OrderPayment) error
 }
@@ -17,7 +19,7 @@ type implementation struct {
 }
 
 func (s *implementation) MakePayment(ctx context.Context, orderPayment model.OrderPayment) error {
-	defer s.Logger().Info(
+	defer s.Logger(ctx).Info(
 		"payment has been processed",
 		"order ID", orderPayment.OrderID,
 		"customer ID", orderPayment.CustomerID,

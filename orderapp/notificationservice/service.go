@@ -17,7 +17,7 @@ type implementation struct {
 }
 
 func (s *implementation) Send(ctx context.Context, notification model.Notification) error {
-	defer s.Logger().Info(
+	defer s.Logger(context.Background()).Info(
 		"notification has been sent",
 		"order ID", notification.OrderID,
 		"customer ID", notification.CustomerID,

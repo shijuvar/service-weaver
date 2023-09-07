@@ -19,6 +19,8 @@ type Repository interface {
 	GetOrderItems(context.Context, string) ([]model.OrderItem, error)
 }
 
+var ctx = context.Background()
+
 // Implementation for Repository interface
 type repository struct {
 	weaver.Implements[Repository]
@@ -30,10 +32,10 @@ type repository struct {
 func (repo *repository) Init(context.Context) error {
 	cfg := repo.Config()
 	if err := cfg.Validate(); err != nil {
-		repo.Logger().Error("error:", err)
+		repo.Logger(ctx).Error("error:", err)
 	}
 	db, err := sql.Open(cfg.Driver, cfg.Source)
-	repo.Logger().Info("connected to DB")
+	repo.Logger(ctx).Info("connected to DB")
 
 	if err != nil {
 		return err

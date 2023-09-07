@@ -11,6 +11,8 @@ import (
 	"github.com/shijuvar/service-weaver/orderapp/paymentservice"
 )
 
+var ctx = context.Background()
+
 type Server struct {
 	weaver.Implements[weaver.Main]
 
@@ -24,7 +26,7 @@ type Server struct {
 }
 
 func (s *Server) Init(context.Context) error {
-	s.Logger().Info("Init")
+	s.Logger(ctx).Info("Init")
 	r := chi.NewRouter()
 	r.Route("/api/orders", func(r chi.Router) {
 		r.Post("/", s.CreateOrder)
@@ -34,9 +36,10 @@ func (s *Server) Init(context.Context) error {
 	return nil
 }
 
-// Serve implements the application main.
+// Serve implements the application main
+// Serve is called by weaver.Run and contains the body of the application.
 func Serve(ctx context.Context, s *Server) error {
-	s.Logger().Info("OrderAPI listener available.", "addr:", s.orderapi)
+	s.Logger(ctx).Info("OrderAPI listener available.", "addr:", s.orderapi)
 	httpServer := &http.Server{
 		Handler: s.handler,
 	}
